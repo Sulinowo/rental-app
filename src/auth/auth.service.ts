@@ -1,8 +1,5 @@
-import {
-  Injectable,
-  ConflictException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { ApiException } from '../common/exceptions/api-exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -28,7 +25,7 @@ export class AuthService {
       where: { email },
     });
     if (existingUser) {
-      throw new ConflictException('User with this email already exists');
+      throw ApiException.emailAlreadyExists(email);
     }
 
     // Generate email verification token
@@ -70,7 +67,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new BadRequestException('Invalid verification token');
+      throw ApiException.invalidVerificationToken();
     }
 
     user.isEmailVerified = true;
